@@ -46,6 +46,7 @@ class SSOPlugin extends MantisPlugin {
     function shibbolethLogin(){
         if (auth_is_user_authenticated())
           return;
+        $g_logout_redirect_page = "junk";
         // get the username from the _SERVER variable
         $username = $this->getUser();
         $t_user_id = user_get_id_by_name($username);
