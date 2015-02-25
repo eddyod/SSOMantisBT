@@ -32,11 +32,12 @@ class SSOPlugin extends MantisPlugin {
 	    return;
       
           # REMOTE_USER is domain\username
-	  $username = getUser();
+	  $username = $this->getUser();
+	  echo "username is " + $username;
 	  $t_user_id = user_get_id_by_name($username);
 	  // if they are not in the DB, insert them
 	  if (empty($t_user_id)) {
-	    $t_user_id = createUser($f_username);
+	    $t_user_id = $this->createUser($f_username);
 	  }
           # If user has a valid id, log in
 	  if ($t_user_id){
