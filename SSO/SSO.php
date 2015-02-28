@@ -69,7 +69,9 @@ class SSOPlugin extends MantisPlugin {
      */
     function getUser() {
         $username = $_SERVER['NETWORKUSERID'];
-        if (empty($username)) $username = $_SERVER['HTTP_RACFID'];
+        if (empty($username)) {
+            $username = $_SERVER['RACFID'];
+        }
         return $username;
     }
     

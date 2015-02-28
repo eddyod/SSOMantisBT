@@ -1,22 +1,65 @@
-# SSOMantisBT
-<p>This is a plugin for the <a
-href="https://www.mantisbt.org/">MantisBT issue tracking software</a>.
-This plugin is still under construction but should work given some
-minor tweaks.</p>
-<p>Here are some assumptions</p>
-<ul>
-<li>You want to use Single Sign On (SSO) from either a Shibboleth
-server or some other SSO provider</li>
-<li>Your entire MantisBT site will be protected by SSO</li>
-<li>Anyone with SSO access will be provided a basic set of
-privileges</li>
-<li>You know what session variables you need to put into the plugin</li>
-</ul>
-<p>If a person with SSO access comes into your mantis site, and is not
-in the database, they will automatically get inserted with the basic
-access rights.</p>
-<p>If they are already in the database, then they are directed to the
-home page of mantisbt</p>
-<p>You'll want to edit the SSO.php file to change the _SERVER
-variables. We use the NETWORKUSERID variable, but you might want to
-change that to REMOTE_USER.</p>
+## Announcements plugin for MantisBT
+
+Copyright (c) 2010 John Reese - http://noswap.com
+
+Released under the [MIT license](http://opensource.org/licenses/MIT)
+
+
+### Description
+
+Lets privileged accounts create and post announcements that can be shown to
+users on a global or per-project basis, and allow users to dismiss individual
+messages.
+
+
+### Requirements
+
+- MantisBT 1.2.0 or above
+- [jQuery plugin](https://github.com/mantisbt-plugins/jquery) 1.4 or above
+
+
+### Installation
+
+- Copy the whole *Announce* directory under mantisbt/plugins/
+- If not installed yet, install the jQuery plugin
+- Go to Manage -> Manage Plugins and install the plugin.
+
+
+### Usage
+
+A new *Announcements* item is added to the Manage menu.
+
+From there, new announcements can be added, targeted at All Projects or a
+specific one, restricted by access levels and limited in time.
+Existing announcements can be edited and deleted.
+
+At this time, the Announcements can only be displayed at the top of the page
+(Location = *Page Header*). In the future, other options may be added.
+
+The *Configuration* page lets the Administrator determine what access levels
+are allowed to manage announcements.
+
+
+### Support
+
+Problems or questions dealing with use and installation should be
+directed to the [#mantisbt](irc://freenode.net/mantisbt) IRC channel
+on Freenode.
+
+The latest source code can found on
+[Github](https://github.com/mantisbt-plugins/announce).
+
+We encourage you to submit Bug reports and enhancements requests on the
+[Github issues tracker](https://github.com/mantisbt-plugins/announce/issues).
+If you would like to propose a patch, do not hesitate to submit a new
+[Pull Request](https://github.com/mantisbt-plugins/announce/compare/).
+
+
+### Change Log
+
+v0.1 - 2010-06-19
+- Initial release
+
+v0.2 - 2014-03-19
+- Added dismissal timestamps for announcements, allowing edited ones to be
+  shown to users again, until they dismiss them a second time
