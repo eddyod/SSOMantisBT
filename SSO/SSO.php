@@ -33,6 +33,10 @@ class SSOPlugin extends MantisPlugin {
         $this->contact = 'eodonnell@ucsd.edu';
         $this->url     = 'http://som.ucsd.edu';
     }
+    
+    function config() {
+        return array('jenkins_user_id' => 4);
+    }
 
     /**
      * Default plugin configuration hook.
@@ -51,10 +55,11 @@ class SSOPlugin extends MantisPlugin {
         // get the username from the _SERVER variable
         $username = $this->getUser();
         $t_user_id = user_get_id_by_name($username);
-	// if the request is coming from the localhost, it is jenkins
-	if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
-	   $t_user_id = 4;
-	}
+        // if the request is coming from the localhost, it is jenkins
+        $jenkins_user_id = plugin_config_get('jenkins_user_id');
+        if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1' && isset($jenkins_user_id)) {
+            $t_user_id = $jenkins_user_id;
+        }
         // if they are not in the DB, insert them
         if (empty($t_user_id)) {
             $t_user_id = $this->createUser($username);
