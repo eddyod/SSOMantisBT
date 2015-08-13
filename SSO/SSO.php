@@ -33,7 +33,10 @@ class SSOPlugin extends MantisPlugin {
         $this->contact = 'eodonnell@ucsd.edu';
         $this->url     = 'http://som.ucsd.edu';
     }
-    
+
+    /**
+     * Hard code the jenkins user id to 4
+     */ 
     function config() {
         return array('jenkins_user_id' => 4);
     }
@@ -46,9 +49,6 @@ class SSOPlugin extends MantisPlugin {
         return $hooks;
     }
 
-    /** if the host is localhost, then that means
-     * the request is coming in from jenkins so we default to user=4
-    */
     function shibbolethLogin(){
         if (auth_is_user_authenticated())
           return;
@@ -87,35 +87,36 @@ class SSOPlugin extends MantisPlugin {
     }
     
     /**
-     * If the user is not in the DB, insert them
+     * If the user is not in the DB, insert them.
+     * Also check if they have an empty email
      */
     function createUser($f_username) {
-      $t_user_id = 0;
-      $f_password = "asldfkassdfad";
-      $test_email = $_SERVER['EMAIL'];
+        $t_user_id = 0;
+        $f_password = "asldfkassdfad";
+        $test_email = $_SERVER['EMAIL'];
       
-      if ($this->validateEmail($test_email)) {
-	$f_email = $test_email;
-      } else {
-	$f_email = "hs-support@ucsd.edu";
-      }
-      $p_access_level = config_get( 'default_new_account_access_level' );
-      $f_protected = false;
-      $f_enabled = true;
-      $t_realname = $_SERVER['FULL_NAME'];
-      $t_cookie = user_create( $f_username, $f_password, $f_email, $p_access_level, $f_protected, $f_enabled, $t_realname );
+        if ($this->validateEmail($test_email)) {
+            $f_email = $test_email;
+        } else {
+            $f_email = "hs-support@ucsd.edu";
+        }
+        $p_access_level = config_get( 'default_new_account_access_level' );
+        $f_protected = false;
+        $f_enabled = true;
+        $t_realname = $_SERVER['FULL_NAME'];
+        $t_cookie = user_create( $f_username, $f_password, $f_email, $p_access_level, $f_protected, $f_enabled, $t_realname );
         
-      if ( $t_cookie === false ) {
-	$t_user_id = 0;
-      } else {
-	// The user was created, get the row again and return the id
-	$t_user_id = user_get_id_by_name( $f_username );
-      }
-      return $t_user_id;
+        if ( $t_cookie === false ) {
+            $t_user_id = 0;
+        } else {
+            // The user was created, get the row again and return the id
+            $t_user_id = user_get_id_by_name( $f_username );
+        }
+        return $t_user_id;
     }
 
     function validateEmail($email) {
-      return filter_var($email, FILTER_VALIDATE_EMAIL);
+        return filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 }
 ?>
