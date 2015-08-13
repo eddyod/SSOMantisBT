@@ -13,7 +13,6 @@
 # #
 # # You should have received a copy of the GNU General Public License
 # # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
-# 
 
 
 require_once(config_get( 'class_path' ) . 'MantisPlugin.class.php');
@@ -43,15 +42,22 @@ class SSOPlugin extends MantisPlugin {
         return $hooks;
     }
 
+    /** if the host is localhost, then that means
+     * the request is coming in from jenkins so we default to user=4
+    */
     function shibbolethLogin(){
         if (auth_is_user_authenticated())
           return;
         // get the username from the _SERVER variable
         $username = $this->getUser();
         $t_user_id = user_get_id_by_name($username);
+	// if the request is coming from the localhost, it is jenkins
+	if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
+	   $t_user_id = 4;
+	}
         // if they are not in the DB, insert them
         if (empty($t_user_id)) {
-            $t_user_id = $this->createUser($f_username);
+            $t_user_id = $this->createUser($username);
         }
         # If user has a valid id, log in
         if ($t_user_id){
@@ -79,22 +85,32 @@ class SSOPlugin extends MantisPlugin {
      * If the user is not in the DB, insert them
      */
     function createUser($f_username) {
-        $t_user_id = 0;
-        $f_password = "asldfkassdfad";
-        $f_email = $_SERVER['EMAIL'];
-        $p_access_level = config_get( 'default_new_account_access_level' );
-        $f_protected = false;
-        $f_enabled = true;
-        $t_realname = $_SERVER['FULL_NAME'];
-        $t_cookie = user_create( $f_username, $f_password, $f_email, $p_access_level, $f_protected, $f_enabled, $t_realname );
+      $t_user_id = 0;
+      $f_password = "asldfkassdfad";
+      $test_email = $_SERVER['EMAIL'];
+      
+      if ($this->validateEmail($test_email)) {
+	$f_email = $test_email;
+      } else {
+	$f_email = "hs-support@ucsd.edu";
+      }
+      $p_access_level = config_get( 'default_new_account_access_level' );
+      $f_protected = false;
+      $f_enabled = true;
+      $t_realname = $_SERVER['FULL_NAME'];
+      $t_cookie = user_create( $f_username, $f_password, $f_email, $p_access_level, $f_protected, $f_enabled, $t_realname );
         
-        if ( $t_cookie === false ) {
-            $t_user_id = 0;
-        } else {
-            # The user was created, get the row again and return the id
-            $t_user_id = user_get_id_by_name( $f_username );
-        }
-        return $t_user_id;
+      if ( $t_cookie === false ) {
+	$t_user_id = 0;
+      } else {
+	// The user was created, get the row again and return the id
+	$t_user_id = user_get_id_by_name( $f_username );
+      }
+      return $t_user_id;
+    }
+
+    function validateEmail($email) {
+      return filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 }
 ?>
